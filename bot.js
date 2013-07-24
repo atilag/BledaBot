@@ -33,14 +33,15 @@ BotEventUtils.prototype.textEventsHub = function textEventsHub(from, to, text, m
 	var self = this;
 	
 	for(var i = 0; i < self._textEvents.length; i++) {
-		//Loop through the event patterns looking for a match on the message.
-		self._textEvents[i].pattern.forEach( function(pattern) {
-			if( text.indexOf(pattern) != -1 ) {
+		for(var e = 0; e < self._textEvents[i].pattern.length; e++) {
+			//Loop through the event patterns looking for a match on the message.
+			if( text.indexOf(self._textEvents[i].pattern[e]) != -1 ) {
 				//Ok, we have a match! Let's fire the eventl
 				this.emit(this._textEvents[i].event, this._textEvents[i].users, from, to, text, message );
+				//We just want one event per message, stop iterating through events.
 				return;
 			}	
-		}, self);
+		}
 	}
 }
 
@@ -49,8 +50,10 @@ BotEventUtils.prototype.eventsLoadedHandler = function eventsLoadedHandler(event
 	this._textEvents = eventsLoaded;
 	var self = this;
 	for(var i = 0; i < eventsLoaded.length; i++ ) {
-		this.on( eventsLoaded[i].event, this[eventsLoaded[i].callback].bind(self) );
+		this.on( eventsLoaded[i].event, this[eventsLoaded[i].callback] );
 	}
+
+	this.on("query", this.queryEventHandler );
 }
 
 /*	This event object consists of: 
@@ -146,6 +149,7 @@ BotEventUtils.prototype.partEventHandler = function partEventHandler() {
 }
 
 BotEventUtils.prototype.queryEventHandler = function queryEventHandler(from, text, message) {
+		this._sendNotification(from, "Query", "Bot QUERY Notification from " + from, text);
 		this._bot.say(from, "Hi " + from + ", I'm just a bot. If you have any questions about me, please ask _AtilA_. Thks!");
 }
 
@@ -200,6 +204,10 @@ Bot.prototype.connect = function ( params ) {
 
 	this.name = params.name;
 	this._bot = bot;
+}
+
+Bot.prototype.say = function say(to, text){
+	this._bot.say(to, text);
 }
 
 Bot.prototype.getName = function getName() {
