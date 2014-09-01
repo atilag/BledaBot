@@ -164,6 +164,7 @@ BotEventUtils.prototype._awsResponseHandler = function _awsResponseHandler(error
 BotEventUtils.prototype._sendNotification = function _sendNotification(from, channel, notificationText, fullText) {	
 		var params = {
 			TopicArn : "arn:aws:sns:us-west-2:423077365911:Bot_Notifications",
+			//TargetArn : "arn:aws:sns:us-west-2:423077365911:Bot_Notifications:d3fe5d8b-0510-40bd-a053-6520291dbcfa",
 			Message : channel + " : <" + from + "> " + fullText,
 			Subject: notificationText
 		};
